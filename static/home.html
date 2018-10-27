@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Home</title>
+    <link rel="stylesheet" href="../assets/css/home.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        height: 100%;
+        width: 100%;
+        background-color: rgb(40, 149, 237);
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .navbar {
+        width: 100%;
+        transform: translate(0, -250px);
+    }
+
+    #parent-div {
+        padding: 10px;
+        display: flex;
+        position: absolute;
+        left: 20%;
+        top: 46%;
+        width: 500px;
+        transform: translate(-50%);
+        
+    }
+
+    input {
+        width: 100%;
+        position: absolute;
+        z-index: -1000;
+    }
+
+    form {
+        width: 100%;
+        height: 200px;
+    }
+
+    .btn {
+        transform: translate(0, 70px);
+    }
+
+    #map {
+        height: 100%;
+        width: 100%;
+        z-index: 10000000000;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Fresh Air</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+                
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="home.html">Look My Place</a>
+            </li>
+            </ul>
+        </div>
+    </nav>
+    <div id="map"></div>
+    <div id="parent-div">
+        <div id="search-field">
+            <form class="formData" onsubmit="return false"> 
+                <img src="images/magnifying-glass.png" alt="">
+                <input name="place" class="form-control" id="exampleFormControlInput1" placeholder="Enter City/ZipCode">
+                <div>
+                    <input type="submit" onclick="sendDetails()" value="Search" class="btn btn-success mb-2"/>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        var map;
+        function sendDetails() {
+            $.ajax({
+                method: "GET",
+                url: "/info/search",
+                data: $(".formData").serialize(),
+                success: function(rawData) {
+                    var newData = JSON.parse(rawData)
+                    console.log(newData);
+                }
+            })
+        }
+        function mapInit() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var location = new google.maps.LatLng({
+                        lat: position.coords.latitude, 
+                        lng: position.coords.longitude
+                    }); 
+                    map = new google.maps.Map(document.getElementById('map'), {
+                        center: location,
+                        zoom: 13
+                    });
+                
+                    var marker = new google.maps.Marker({
+                        position: location,
+                        map: map,
+                    });
+                }, function() {
+                    handleLocationError(true, infoWindow, map.getCenter());
+                });
+                } else {
+                    handleLocationError(false, infoWindow, map.getCenter());
+                }
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBIi375AAH5_8Lkuzq6hF1ekBsDuTeO-Fc&callback=mapInit"
+    async defer></script>
+</body>
+</html>
